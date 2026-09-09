@@ -18,7 +18,7 @@ public:
 	AGP_DungeonEntrance();
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cosmetic") 
-	USkeletalMesh* DungeonEntranceMesh; 
+	TObjectPtr<UStaticMeshComponent> DungeonStaticMesh; 
 
 
 protected:
