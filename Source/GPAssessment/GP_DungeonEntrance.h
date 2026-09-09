@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GP_InteractInterface.h"
+#include "Components/SphereComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "GP_DungeonEntrance.generated.h"
 
 UCLASS()
@@ -19,6 +21,15 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cosmetic") 
 	TObjectPtr<UStaticMeshComponent> DungeonStaticMesh; 
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Functional")
+	TObjectPtr<USphereComponent> WidgetProximitySphere; 
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cosmetic") 
+	TSubclassOf<class UUserWidget> InteractWidget; 
+	
+	UPROPERTY()
+	UUserWidget* InteractionWidgetInstance; 
 
 
 protected:
@@ -31,5 +42,11 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	virtual void Interact() override; 
+	
+	void OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComponentclass, AActor* OverlappedActor, UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult); 
+	
+	void OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponentclass, AActor* OverlappedActor, UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult); 
 
 };

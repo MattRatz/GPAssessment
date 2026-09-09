@@ -10,7 +10,12 @@ AGP_DungeonEntrance::AGP_DungeonEntrance()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	DungeonStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>("DungeonEntranceSM"); 
+	WidgetProximitySphere = CreateDefaultSubobject<USphereComponent>("WidgetProximitySphere");
+	WidgetProximitySphere->SetMobility(EComponentMobility::Movable); 
 	RootComponent = DungeonStaticMesh; 
+	
+	WidgetProximitySphere->SetupAttachment(DungeonStaticMesh);
+	
 	
 
 }
@@ -19,6 +24,24 @@ AGP_DungeonEntrance::AGP_DungeonEntrance()
 void AGP_DungeonEntrance::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	if (InteractWidget)
+	{
+		InteractionWidgetInstance = CreateWidget<UUserWidget>(GetWorld(), InteractWidget); 
+		
+		if (InteractionWidgetInstance)
+		{
+			InteractionWidgetInstance->AddToViewport(); 
+			InteractionWidgetInstance->SetVisibility(ESlateVisibility::Hidden);  
+		}
+	}
+	
+	if (WidgetProximitySphere)
+	{
+		WidgetProximitySphere->OnComponentBeginOverlap.AddDynamic(this, &AGP_DungeonEntrance::OnSphereOverlapBegin); 
+		WidgetProximitySphere->OnComponentBeginOverlap.AddDynamic(this, &AGP_DungeonEntrance::OnSphereOverlapEnd);
+	}
+	
 	
 }
 
@@ -30,6 +53,18 @@ void AGP_DungeonEntrance::Tick(float DeltaTime)
 }
 
 void AGP_DungeonEntrance::Interact()
+{
+	
+}
+
+void AGP_DungeonEntrance::OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComponentclass, AActor* OverlappedActor, UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	
+}
+
+void AGP_DungeonEntrance::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponentclass, AActor* OverlappedActor, UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	
 }
