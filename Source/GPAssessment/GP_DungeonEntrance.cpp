@@ -3,6 +3,8 @@
 
 #include "GP_DungeonEntrance.h"
 
+#include "GPAssessmentCharacter.h"
+
 // Sets default values
 AGP_DungeonEntrance::AGP_DungeonEntrance()
 {
@@ -11,10 +13,16 @@ AGP_DungeonEntrance::AGP_DungeonEntrance()
 	
 	DungeonStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>("DungeonEntranceSM"); 
 	WidgetProximitySphere = CreateDefaultSubobject<USphereComponent>("WidgetProximitySphere");
+	TestWidget = CreateDefaultSubobject<UWidgetComponent>("TestWidgetComponent"); 
+	
 	WidgetProximitySphere->SetMobility(EComponentMobility::Movable); 
 	RootComponent = DungeonStaticMesh; 
 	
 	WidgetProximitySphere->SetupAttachment(DungeonStaticMesh);
+	TestWidget->SetupAttachment(DungeonStaticMesh);
+	
+	TestWidget->SetWidgetSpace(EWidgetSpace::World); 
+	TestWidget->SetDrawSize(FVector2D(500.0f, 500.0f));
 	
 	
 
@@ -25,22 +33,26 @@ void AGP_DungeonEntrance::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (InteractWidget)
+	FVector EntranceLocation = DungeonStaticMesh->GetComponentLocation(); 
+	SetActorTickEnabled(false);
+	if (TestWidget)
 	{
-		InteractionWidgetInstance = CreateWidget<UUserWidget>(GetWorld(), InteractWidget); 
+		TestWidget->SetWidgetClass(InteractWidget); 
+		TestWidget->SetVisibility(true); 
+		TestWidgetInstance = TestWidget->GetUserWidgetObject();
+		TestWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
 		
-		if (InteractionWidgetInstance)
-		{
-			InteractionWidgetInstance->AddToViewport(); 
-			InteractionWidgetInstance->SetVisibility(ESlateVisibility::Hidden);  
-		}
 	}
 	
 	if (WidgetProximitySphere)
 	{
 		WidgetProximitySphere->OnComponentBeginOverlap.AddDynamic(this, &AGP_DungeonEntrance::OnSphereOverlapBegin); 
-		WidgetProximitySphere->OnComponentBeginOverlap.AddDynamic(this, &AGP_DungeonEntrance::OnSphereOverlapEnd);
+		WidgetProximitySphere->OnComponentEndOverlap.AddDynamic(this, &AGP_DungeonEntrance::OnSphereOverlapEnd); 
+		WidgetProximitySphere->SetCollisionResponseToAllChannels(ECR_Overlap); 
+		WidgetProximitySphere->SetGenerateOverlapEvents(true); 
 	}
+	
+	PlayerRef = UGameplayStatics::GetPlayerPawn(this, 0);
 	
 	
 }
@@ -49,6 +61,18 @@ void AGP_DungeonEntrance::BeginPlay()
 void AGP_DungeonEntrance::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	if (PlayerRef)
+	{
+		FVector PlayerLocation = PlayerRef->GetActorLocation(); 
+		FVector WidgetLocation = TestWidget->GetComponentLocation(); 
+		FRotator PlayerWidgetLookAtRotation = (PlayerLocation - WidgetLocation).Rotation();
+		
+		FRotator NewLookAtRotation = FRotator(0.0f, PlayerWidgetLookAtRotation.Yaw, 0.0f); 
+	
+		TestWidget->SetWorldRotation(NewLookAtRotation);
+	}
+	
 
 }
 
@@ -57,14 +81,36 @@ void AGP_DungeonEntrance::Interact()
 	
 }
 
-void AGP_DungeonEntrance::OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComponentclass, AActor* OverlappedActor, UPrimitiveComponent* OtherComp,
+void AGP_DungeonEntrance::OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OverlappedActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	
-}
-
-void AGP_DungeonEntrance::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponentclass, AActor* OverlappedActor, UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
+	if (OverlappedActor->IsA(AGPAssessmentCharacter::StaticClass()))
+	{
+		Cast<AGPAssessmentCharacter>(OverlappedActor)->StoreInteractableActor(this); 
+		Cast<AGPAssessmentCharacter>(OverlappedActor)->ComponentToFocus = DungeonStaticMesh;
+		Cast<AGPAssessmentCharacter>(OverlappedActor)->SetActorTickEnabled(true);
+		SetActorTickEnabled(true);
+		UE_LOG(LogTemp, Warning, TEXT("Overlap Begin")); 
+		TestWidgetInstance->SetVisibility(ESlateVisibility::Visible);
+		
+		
+	}
 	
 }
+
+void AGP_DungeonEntrance::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OverlappedActor, UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex)
+{
+	if (OverlappedActor->IsA(AGPAssessmentCharacter::StaticClass()))
+	{
+		Cast<AGPAssessmentCharacter>(OverlappedActor)->RemoveInteractableActor();
+		Cast<AGPAssessmentCharacter>(OverlappedActor)->ComponentToFocus = nullptr;
+		Cast<AGPAssessmentCharacter>(OverlappedActor)->SetActorTickEnabled(false);
+		SetActorTickEnabled(false);
+		UE_LOG(LogTemp, Warning, TEXT("Overlap End"));
+		TestWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+

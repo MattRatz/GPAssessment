@@ -10,6 +10,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "InterchangeResult.h"
 #include "KismetTraceUtils.h"
 #include "Engine/LocalPlayer.h"
 
@@ -22,6 +23,7 @@ AGPAssessmentCharacter::AGPAssessmentCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
+	PrimaryActorTick.bCanEverTick = true; 
 		
 	// Create a CameraComponent	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
@@ -44,6 +46,9 @@ void AGPAssessmentCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+	SetActorTickEnabled(false); 
+	OriginalFOV = FirstPersonCameraComponent->FieldOfView;
+	OriginalCamRotation = FirstPersonCameraComponent->GetComponentRotation();
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -99,6 +104,17 @@ void AGPAssessmentCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+void AGPAssessmentCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime); 
+	
+	if (ComponentToFocus)
+	{
+		ZoomPlayerCam(DeltaTime);
+	}
+	
+}
+
 void AGPAssessmentCharacter::InteractInput(const FInputActionValue& Value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Player used Interact")); 
@@ -119,7 +135,7 @@ void AGPAssessmentCharacter::InteractInput(const FInputActionValue& Value)
 		VectorTraceEnd, 
 		TraceRadius, 
 		UEngineTypes::ConvertToTraceType(ECC_Visibility), 
-		false, 
+		true, 
 		ActorsToIgnoreInTrace,
 		EDrawDebugTrace::Persistent, 
 		HitActorByTrace, 
@@ -134,8 +150,14 @@ true);
 		}
 		else
 		{
+			InteractWithActor(); 
+			
 			UE_LOG(LogTemp, Warning, TEXT("Object does not implement interface")); 
 		}
+	}
+	else
+	{
+		InteractWithActor(); 
 	}
 	
 	UE_LOG(LogTemp, Warning, TEXT("Player used Interact")); 
@@ -143,6 +165,57 @@ true);
 }
 
 void AGPAssessmentCharacter::Interact()
+{
+	
+}
+
+void AGPAssessmentCharacter::StoreInteractableActor(AActor* ActorToStore)
+{
+	StoredInteractActor = ActorToStore; 
+}
+
+void AGPAssessmentCharacter::RemoveInteractableActor()
+{
+	StoredInteractActor = nullptr; 
+}
+
+void AGPAssessmentCharacter::InteractWithActor()
+{
+	if (StoredInteractActor)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Player trying to interact"));  
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No interactable actor found")); 
+	}
+}
+
+void AGPAssessmentCharacter::ZoomPlayerCam(float DeltaTime)
+{
+	FirstPersonCameraComponent->bUsePawnControlRotation = false;
+	float CurrentFOV = FirstPersonCameraComponent->FieldOfView;
+	FRotator CurrentCamRotation = FirstPersonCameraComponent->GetComponentRotation();
+	if (FirstPersonCameraComponent)
+	{
+		//float OriginalCamFOV = PlayerCam->FieldOfView();
+	}
+	
+	FRotator PlayerDungeonLookAtRotation = (ComponentToFocus->GetComponentLocation() - GetActorLocation()).Rotation();
+	
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		FRotator NewRotation = FMath::RInterpTo(CurrentCamRotation, PlayerDungeonLookAtRotation, DeltaTime, RotationSpeedZoomIn);
+		PC->SetControlRotation(NewRotation);
+	}
+	
+	FirstPersonCameraComponent->SetFieldOfView(CurrentFOV + (-10.f * DeltaTime)); 
+
+	UE_LOG(LogTemp, Warning, TEXT("Rotation to hit: %s, Player Rotation %s"), *PlayerDungeonLookAtRotation.ToString(), *CurrentCamRotation.ToString());
+	
+}
+
+void AGPAssessmentCharacter::DeZoomPlayerCam(float DeltaTime)
 {
 	
 }

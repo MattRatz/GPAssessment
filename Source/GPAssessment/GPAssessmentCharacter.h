@@ -41,15 +41,49 @@ class AGPAssessmentCharacter : public ACharacter, public IGP_InteractInterface
 	//Interact Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true")) 
 	UInputAction* InteractAction; 
+
 	
 public:
 	AGPAssessmentCharacter();
 	
+	void StoreInteractableActor(AActor* ActorToStore);
+	
+	void RemoveInteractableActor(); 
+	
+	void InteractWithActor(); 
+	
+	void ZoomPlayerCam(float DeltaTime); 
+	
+	void DeZoomPlayerCam(float DeltaTime); 
+	
 	virtual void Interact() override; 
+	
+	virtual void Tick(float DeltaTime) override; 
+	
+	UPROPERTY()
+	TObjectPtr<UStaticMeshComponent> ComponentToFocus;
+	
+	UPROPERTY()
+	FRotator OriginalCamRotation; 
+	
+	UPROPERTY()
+	float OriginalFOV; 
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float RotationSpeedZoomIn = .25f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float RotationSpeedZoomOut = 4.0f;
 
 
 protected:
 	virtual void BeginPlay();
+	
+	UPROPERTY()
+	TObjectPtr<AActor> StoredInteractActor; 
+	
+private:
+
 
 public:
 		

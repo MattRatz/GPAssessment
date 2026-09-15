@@ -6,8 +6,13 @@
 #include "GameFramework/Actor.h"
 #include "GP_InteractInterface.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h" 
 #include "Blueprint/UserWidget.h"
+#include "Camera/CameraComponent.h"
+#include "Components/WidgetComponent.h"
 #include "GP_DungeonEntrance.generated.h"
+
+class UWidgetComponent; 
 
 UCLASS()
 class GPASSESSMENT_API AGP_DungeonEntrance : public AActor, public IGP_InteractInterface 
@@ -23,13 +28,21 @@ public:
 	TObjectPtr<UStaticMeshComponent> DungeonStaticMesh; 
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Functional")
-	TObjectPtr<USphereComponent> WidgetProximitySphere; 
+	TObjectPtr<USphereComponent> WidgetProximitySphere;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cosmetic")
+	TObjectPtr<UWidgetComponent> TestWidget; 
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cosmetic") 
 	TSubclassOf<class UUserWidget> InteractWidget; 
 	
 	UPROPERTY()
-	UUserWidget* InteractionWidgetInstance; 
+	TObjectPtr<UUserWidget> TestWidgetInstance;  
+
+private: 
+	
+	UPROPERTY()
+	TObjectPtr<AActor> PlayerRef; 
 
 
 protected:
@@ -43,10 +56,15 @@ public:
 	
 	virtual void Interact() override; 
 	
-	void OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComponentclass, AActor* OverlappedActor, UPrimitiveComponent* OtherComp,
+	UFUNCTION()
+	void ZoomPlayerCam(); 
+	
+	UFUNCTION()
+	void OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OverlappedActor, UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult); 
 	
-	void OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponentclass, AActor* OverlappedActor, UPrimitiveComponent* OtherComp,
-		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult); 
+	UFUNCTION()
+	void OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OverlappedActor, UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex); 
 
 };
