@@ -106,7 +106,6 @@ void AGP_DungeonEntrance::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComp
 	{
 		Cast<AGPAssessmentCharacter>(OverlappedActor)->RemoveInteractableActor();
 		Cast<AGPAssessmentCharacter>(OverlappedActor)->ComponentToFocus = nullptr;
-		Cast<AGPAssessmentCharacter>(OverlappedActor)->SetActorTickEnabled(false);
 		SetActorTickEnabled(false);
 		UE_LOG(LogTemp, Warning, TEXT("Overlap End"));
 		TestWidgetInstance->SetVisibility(ESlateVisibility::Hidden);

@@ -49,6 +49,8 @@ void AGPAssessmentCharacter::BeginPlay()
 	SetActorTickEnabled(false); 
 	OriginalFOV = FirstPersonCameraComponent->FieldOfView;
 	OriginalCamRotation = FirstPersonCameraComponent->GetComponentRotation();
+	
+	UE_LOG(LogTemp, Warning, TEXT("Original FOV %f, OriginalCamRotation %s"), OriginalFOV, *OriginalCamRotation.ToString()  );
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -111,6 +113,10 @@ void AGPAssessmentCharacter::Tick(float DeltaTime)
 	if (ComponentToFocus)
 	{
 		ZoomPlayerCam(DeltaTime);
+	}
+	else if (!ComponentToFocus)
+	{
+		DeZoomPlayerCam(DeltaTime); 
 	}
 	
 }
@@ -209,7 +215,8 @@ void AGPAssessmentCharacter::ZoomPlayerCam(float DeltaTime)
 		PC->SetControlRotation(NewRotation);
 	}
 	
-	FirstPersonCameraComponent->SetFieldOfView(CurrentFOV + (-10.f * DeltaTime)); 
+	//Mulitply by negative 1 to zoom in. 
+	FirstPersonCameraComponent->SetFieldOfView(CurrentFOV + ((FovZoomSpeed * -1) * DeltaTime)); 
 
 	UE_LOG(LogTemp, Warning, TEXT("Rotation to hit: %s, Player Rotation %s"), *PlayerDungeonLookAtRotation.ToString(), *CurrentCamRotation.ToString());
 	
@@ -217,5 +224,28 @@ void AGPAssessmentCharacter::ZoomPlayerCam(float DeltaTime)
 
 void AGPAssessmentCharacter::DeZoomPlayerCam(float DeltaTime)
 {
+	float CurrentFOV = FirstPersonCameraComponent->FieldOfView; 
+	FirstPersonCameraComponent->bUsePawnControlRotation = false;
+	FRotator CurrentCamRotation = FirstPersonCameraComponent->GetComponentRotation(); 
+	float CompareVariance = 1.0f; 
 	
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+
+		if (!FMath::IsNearlyEqual(CurrentFOV, OriginalFOV, CompareVariance))
+		{
+			FirstPersonCameraComponent->SetFieldOfView(CurrentFOV + ((FovZoomSpeed * 2) * DeltaTime));
+			CurrentFOV = FirstPersonCameraComponent->FieldOfView; 
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("OriginalCamRotation %s, CurrentCamRotation %s"), *OriginalCamRotation.ToString(), *CurrentCamRotation.ToString());
+		}
+		
+		UE_LOG(LogTemp, Warning, TEXT("Original FOV %f, OriginalCamRotation %s"), OriginalFOV, *OriginalCamRotation.ToString()  );
+	}
+	if (FMath::IsNearlyEqual(CurrentFOV, OriginalFOV,  CompareVariance))
+	{
+		SetActorTickEnabled(false); 
+	}
 }

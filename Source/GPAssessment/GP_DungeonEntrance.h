@@ -57,9 +57,6 @@ public:
 	virtual void Interact() override; 
 	
 	UFUNCTION()
-	void ZoomPlayerCam(); 
-	
-	UFUNCTION()
 	void OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OverlappedActor, UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult); 
 	

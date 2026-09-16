@@ -74,6 +74,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float RotationSpeedZoomOut = 4.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float FovZoomSpeed = 10.0f; 
 
 
 protected:
