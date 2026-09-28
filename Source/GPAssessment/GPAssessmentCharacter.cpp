@@ -216,7 +216,9 @@ void AGPAssessmentCharacter::ZoomPlayerCam(float DeltaTime)
 	}
 	
 	//Mulitply by negative 1 to zoom in. 
-	FirstPersonCameraComponent->SetFieldOfView(CurrentFOV + ((FovZoomSpeed * -1) * DeltaTime)); 
+	CurrentFOV = (CurrentFOV + ((FovZoomSpeed * -1) * DeltaTime)); 
+	CurrentFOV = FMath::Clamp(CurrentFOV, 20.f, 120.f); 
+	FirstPersonCameraComponent->SetFieldOfView(CurrentFOV);
 
 	UE_LOG(LogTemp, Warning, TEXT("Rotation to hit: %s, Player Rotation %s"), *PlayerDungeonLookAtRotation.ToString(), *CurrentCamRotation.ToString());
 	
@@ -225,7 +227,7 @@ void AGPAssessmentCharacter::ZoomPlayerCam(float DeltaTime)
 void AGPAssessmentCharacter::DeZoomPlayerCam(float DeltaTime)
 {
 	float CurrentFOV = FirstPersonCameraComponent->FieldOfView; 
-	FirstPersonCameraComponent->bUsePawnControlRotation = false;
+	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 	FRotator CurrentCamRotation = FirstPersonCameraComponent->GetComponentRotation(); 
 	float CompareVariance = 1.0f; 
 	
