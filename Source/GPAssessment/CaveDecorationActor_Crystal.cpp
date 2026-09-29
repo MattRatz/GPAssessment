@@ -28,7 +28,6 @@ void ACaveDecorationActor_Crystal::ChangeMaterialScalar(float ScalarValue)
 	Super::ChangeMaterialScalar(ScalarValue);
 	if (ObjectMID)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("RUNNING CODE:: Scalar Value - %f"), ScalarValue); 
 		ObjectMID->SetScalarParameterValue(FName("EmissiveParam"), ScalarValue);
 	}
 }

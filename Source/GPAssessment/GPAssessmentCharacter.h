@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "Blueprint/UserWidget.h"
 #include "GP_InteractInterface.h"
 #include "GPAssessmentCharacter.generated.h"
 
@@ -14,6 +15,7 @@ class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
+class UUserWidget; 
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -75,12 +77,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float RotationSpeedZoomOut = 4.0f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float FovZoomSpeed = 10.0f; 
 
 
 protected:
 	virtual void BeginPlay();
+	
 	
 	UPROPERTY()
 	TObjectPtr<AActor> StoredInteractActor; 

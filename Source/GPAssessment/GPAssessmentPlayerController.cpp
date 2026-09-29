@@ -8,11 +8,34 @@
 void AGPAssessmentPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// get the enhanced input subsystem
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+	
+	if (MaterialEditorWidget)
 	{
-		// add the mapping context so we get controls
-		Subsystem->AddMappingContext(InputMappingContext, 0);
+		UE_LOG(LogTemp, Warning, TEXT("MaterialEditorDoesExist")); 
+		MaterialEditorInstance = CreateWidget<UUserWidget>(this, MaterialEditorWidget);
+		if (MaterialEditorInstance)
+		{
+			MaterialEditorInstance->AddToViewport();
+			UE_LOG(LogTemp, Warning, TEXT("Added to Viewport")); 
+			MaterialEditorInstance->SetVisibility(ESlateVisibility::Hidden);
+		}
+
+	}
+}
+
+void AGPAssessmentPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent(); // Crucial! This sets up the underlying input systems.
+
+	// Inject your Input Mapping Context (IMC) here
+	if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		{
+			if (DefaultMappingContext)
+			{
+				Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			}
+		}
 	}
 }

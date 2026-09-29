@@ -50,8 +50,10 @@ void AGPAssessmentCharacter::BeginPlay()
 	OriginalFOV = FirstPersonCameraComponent->FieldOfView;
 	OriginalCamRotation = FirstPersonCameraComponent->GetComponentRotation();
 	
+	
 	UE_LOG(LogTemp, Warning, TEXT("Original FOV %f, OriginalCamRotation %s"), OriginalFOV, *OriginalCamRotation.ToString()  );
 }
+
 
 //////////////////////////////////////////////////////////////////////////// Input
 

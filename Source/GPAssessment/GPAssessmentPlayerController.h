@@ -3,10 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Blueprint/UserWidget.h"
+#include "EnhancedInputSubsystems.h"
+#include "Components/SlateWrapperTypes.h"
+#include "EnhancedInputComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GPAssessmentPlayerController.generated.h"
 
+
 class UInputMappingContext;
+class UUserWidget; 
 
 /**
  *
@@ -26,6 +32,18 @@ protected:
 protected:
 
 	virtual void BeginPlay() override;
+	
+	virtual void SetupInputComponent() override; 
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputMappingContext* DefaultMappingContext;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> MaterialEditorWidget; 
+	
+	UPROPERTY()
+	UUserWidget* MaterialEditorInstance; 
+	
 
 	// End Actor interface
 };
