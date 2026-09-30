@@ -33,6 +33,11 @@ protected:
 public: 
 	
 	void OpenMenuUI(TSubclassOf<UUserWidget> WidgetToOpen);
+	
+	void CloseMenuUI(); 
+	
+	UPROPERTY()
+	UUserWidget* ActiveWidgetInstance;
 protected:
 
 	virtual void BeginPlay() override;
@@ -45,8 +50,6 @@ protected:
 	UPROPERTY()
 	UUserWidget* MaterialEditorInstance; 
 	
-	UPROPERTY()
-	UUserWidget* ActiveWidgetInstance; 
 	
 
 	// End Actor interface

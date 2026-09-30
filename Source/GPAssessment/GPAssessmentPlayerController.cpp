@@ -64,3 +64,18 @@ void AGPAssessmentPlayerController::OpenMenuUI(TSubclassOf<UUserWidget> WidgetTo
 		}
 	}
 }
+
+void AGPAssessmentPlayerController::CloseMenuUI()
+{
+
+	if (ActiveWidgetInstance)
+	{
+		FInputModeGameOnly InputMode; 
+		SetInputMode(InputMode); 
+		ActiveWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
+		bShowMouseCursor = false;
+		
+	}
+	
+
+}

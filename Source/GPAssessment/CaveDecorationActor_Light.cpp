@@ -16,10 +16,10 @@ void ACaveDecorationActor_Light::BeginPlay()
 	if (PointLight)
 	{
 		ObjectMaterial = PointLight->LightFunctionMaterial; 
+		UE_LOG(LogTemp, Warning, TEXT("Created and assigned Light Function MID: %s"), *ObjectMaterial->GetName());
 		ObjectMID = UMaterialInstanceDynamic::Create(ObjectMaterial, this);
 		PointLight->LightFunctionMaterial = ObjectMID; 
-		UE_LOG(LogTemp, Warning, TEXT("Created and assigned Light Function MID: %s"),
-	*ObjectMID->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("PointLight Material: %s"), *PointLight->LightFunctionMaterial->GetName());
 	}
 }
 
@@ -28,8 +28,12 @@ void ACaveDecorationActor_Light::ChangeMaterialScalar(FName ParamName, float Sca
 	Super::ChangeMaterialScalar(ParamName, ScalarValue);
 	if (ObjectMID)
 	{
+		float OutValue = 0.0f; 
 		UE_LOG(LogTemp, Warning, TEXT("LightSliderClicked"));
-		ObjectMID->SetScalarParameterValue(FName(ParamName), 5.0f);
+		ObjectMID->SetScalarParameterValue(ParamName, ScalarValue);
+		UE_LOG(LogTemp, Warning, TEXT("Created and assigned Light Function MID: %s"), *ObjectMID->GetName());
+		ObjectMID->GetScalarParameterValue(FName(ParamName),OutValue);
+		UE_LOG(LogTemp, Warning, TEXT(" OutValue: %f"), OutValue);
 	}
 }
 

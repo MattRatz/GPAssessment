@@ -32,6 +32,8 @@ void ACaveDecorationActor::BeginPlay()
 		ObjectMesh->SetMaterial(0, ObjectMID); 
 	}
 	
+	
+	
 }
 
 // Called every frame

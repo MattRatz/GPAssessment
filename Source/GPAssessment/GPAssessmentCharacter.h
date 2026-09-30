@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "Blueprint/UserWidget.h"
+#include "Animation/AnimInstance.h"
+#include "Animation/AnimMontage.h"
+#include "CaveDecorationActor.h"
 #include "GP_InteractInterface.h"
 #include "GPAssessmentCharacter.generated.h"
 
@@ -16,6 +19,7 @@ class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
 class UUserWidget; 
+class UAnimMontage; 
 class IGP_InteractInterface;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -43,11 +47,20 @@ class AGPAssessmentCharacter : public ACharacter, public IGP_InteractInterface
 	
 	//Interact Action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true")) 
-	UInputAction* InteractAction; 
+	UInputAction* InteractAction;
+	
+	//Select action (with mouse)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* SelectAction; 
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* CancelAction; 
 
 	
 public:
 	AGPAssessmentCharacter();
+	
+	TArray<ACaveDecorationActor*> CaveDecorations;
 	
 	void StoreInteractableActor(AActor* ActorToStore);
 	
@@ -65,6 +78,9 @@ public:
 	
 	UPROPERTY()
 	TObjectPtr<UStaticMeshComponent> ComponentToFocus;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAnimMontage> SelectMontage; 
 	
 	UPROPERTY()
 	FRotator OriginalCamRotation; 
@@ -84,6 +100,7 @@ public:
 protected:
 	virtual void BeginPlay();
 	
+	void PlayAttackMontage(); 
 	
 	UPROPERTY()
 	TObjectPtr<AActor> StoredInteractActor; 
@@ -106,6 +123,10 @@ protected:
 	
 	// Called for interact input
 	void InteractInput(const FInputActionValue& Value); 
+	
+	void SelectInput(const FInputActionValue& Value); 
+	
+	void CancelInput(const FInputActionValue& Value); 
 
 
 protected:

@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "GPAssessmentCharacter.h"
+
+#include "CaveDecorationActor.h"
 #include "GPAssessmentProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "GP_InteractInterface.h"
@@ -9,6 +11,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GPAssessmentPlayerController.h"
 #include "InputActionValue.h"
 #include "InterchangeResult.h"
 #include "KismetTraceUtils.h"
@@ -52,6 +55,27 @@ void AGPAssessmentCharacter::BeginPlay()
 	
 	
 	UE_LOG(LogTemp, Warning, TEXT("Original FOV %f, OriginalCamRotation %s"), OriginalFOV, *OriginalCamRotation.ToString()  );
+	
+	TArray<AActor*> FoundActors;
+	
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACaveDecorationActor::StaticClass(), FoundActors); 
+	for (AActor* EachActor : FoundActors)
+	{
+		if (ACaveDecorationActor* DecorationToAdd = Cast<ACaveDecorationActor>(EachActor))
+		{
+			CaveDecorations.Add(DecorationToAdd);
+		}
+	}
+}
+
+void AGPAssessmentCharacter::PlayAttackMontage()
+{
+	UAnimInstance* AnimInstance = GetMesh1P() ? GetMesh1P()->GetAnimInstance() : nullptr; 
+	
+	if (AnimInstance && SelectMontage)
+	{
+		float MontageLength = AnimInstance->Montage_Play(SelectMontage, 5.0f); 
+	}
 }
 
 
@@ -74,6 +98,10 @@ void AGPAssessmentCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 		
 		//Interacting
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AGPAssessmentCharacter::InteractInput); 
+		
+		EnhancedInputComponent->BindAction(SelectAction, ETriggerEvent::Triggered, this, &AGPAssessmentCharacter::SelectInput);
+		
+		EnhancedInputComponent->BindAction(CancelAction, ETriggerEvent::Triggered, this, &AGPAssessmentCharacter::CancelInput);
 	}
 	else
 	{
@@ -145,7 +173,7 @@ void AGPAssessmentCharacter::InteractInput(const FInputActionValue& Value)
 		UEngineTypes::ConvertToTraceType(ECC_Visibility), 
 		true, 
 		ActorsToIgnoreInTrace,
-		EDrawDebugTrace::Persistent, 
+		EDrawDebugTrace::None, 
 		HitActorByTrace, 
 true); 	
 	
@@ -155,6 +183,7 @@ true);
 		if (HitActorByTrace.GetActor()->Implements<UGP_InteractInterface>())
 		{
 			Cast<IGP_InteractInterface>(HitActorByTrace.GetActor())->Interact();
+			
 		}
 		else
 		{
@@ -170,6 +199,54 @@ true);
 	
 	UE_LOG(LogTemp, Warning, TEXT("Player used Interact")); 
 	
+}
+
+void AGPAssessmentCharacter::SelectInput(const FInputActionValue& Value)
+{
+	FHitResult HitResult; 
+	
+	for (ACaveDecorationActor* EachDecoration : CaveDecorations)
+	{
+		EachDecoration->DeSelectMaterial(); 
+	}
+	
+	if (AGPAssessmentPlayerController* PC = Cast<AGPAssessmentPlayerController>(GetController()))
+	{
+		if (PC->bShowMouseCursor)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Player can Select"));
+			if (SelectMontage)
+			{
+				PlayAttackMontage(); 
+				PC->GetHitResultUnderCursor(ECC_Visibility, false, HitResult); 
+				if (HitResult.bBlockingHit)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Blocking Hit true, Actor hit: %s"), *HitResult.GetActor()->GetName());
+					AActor* HitActor = HitResult.GetActor();
+					{
+						if (ACaveDecorationActor* SelectedActor = Cast<ACaveDecorationActor>(HitActor))
+						{
+							UE_LOG(LogTemp, Warning, TEXT("all true trying cast"));
+							Cast<ACaveDecorationActor>(HitActor)->SelectMaterial();
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			
+			UE_LOG(LogTemp, Warning, TEXT("Player does not select input"));
+		}
+	}
+}
+
+void AGPAssessmentCharacter::CancelInput(const FInputActionValue& Value)
+{
+	if (AGPAssessmentPlayerController* PC = Cast<AGPAssessmentPlayerController>(GetController()))
+	{
+		PC->CloseMenuUI(); 
+	}
 }
 
 void AGPAssessmentCharacter::Interact()
