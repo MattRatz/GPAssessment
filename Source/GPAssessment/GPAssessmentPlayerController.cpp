@@ -15,6 +15,7 @@ void AGPAssessmentPlayerController::BeginPlay()
 		MaterialEditorInstance = CreateWidget<UUserWidget>(this, MaterialEditorWidget);
 		if (MaterialEditorInstance)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Widget to Open %s "), *GetNameSafe(MaterialEditorInstance));
 			MaterialEditorInstance->AddToViewport();
 			UE_LOG(LogTemp, Warning, TEXT("Added to Viewport")); 
 			MaterialEditorInstance->SetVisibility(ESlateVisibility::Hidden);
@@ -36,6 +37,30 @@ void AGPAssessmentPlayerController::SetupInputComponent()
 			{
 				Subsystem->AddMappingContext(DefaultMappingContext, 0);
 			}
+		}
+	}
+}
+
+void AGPAssessmentPlayerController::OpenMenuUI(TSubclassOf<UUserWidget> WidgetToOpen)
+{
+	if (WidgetToOpen)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Trying Menu"));
+		bShowMouseCursor = true;  
+		FInputModeGameAndUI InputMode; 
+		SetInputMode(InputMode); 
+		
+		UE_LOG(LogTemp, Warning, TEXT("Widget to Open %s, "), *WidgetToOpen->GetName());
+		
+		if (WidgetToOpen == MaterialEditorWidget)
+		{
+			if (IsValid(MaterialEditorInstance))
+			{
+				ActiveWidgetInstance = MaterialEditorInstance;
+				MaterialEditorInstance->SetVisibility(ESlateVisibility::Visible);
+			}
+
+			
 		}
 	}
 }

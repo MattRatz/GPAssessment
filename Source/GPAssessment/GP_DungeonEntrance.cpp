@@ -78,7 +78,11 @@ void AGP_DungeonEntrance::Tick(float DeltaTime)
 
 void AGP_DungeonEntrance::Interact()
 {
-	
+	if (AGPAssessmentPlayerController* PC = Cast<AGPAssessmentPlayerController>(GetWorld()->GetFirstPlayerController()))
+	{
+		PC->OpenMenuUI(WidgetToOpen);
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Interacting with Entrance")); 
 }
 
 void AGP_DungeonEntrance::OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OverlappedActor, UPrimitiveComponent* OtherComp,

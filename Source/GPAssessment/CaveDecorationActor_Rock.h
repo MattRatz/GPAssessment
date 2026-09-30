@@ -21,7 +21,7 @@ public:
 	float ElapsedTime = 0.0f; 
 	virtual void BeginPlay() override; 
 	
-	virtual void ChangeMaterialScalar(float ScalarValue) override; 
+	virtual void ChangeMaterialScalar(FName ParamName, float ScalarValue) override; 
 	
 	virtual void Tick( float DeltaTime ) override;
 	

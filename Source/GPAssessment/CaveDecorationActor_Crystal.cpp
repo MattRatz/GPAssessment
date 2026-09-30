@@ -16,19 +16,17 @@ void ACaveDecorationActor_Crystal::BeginPlay()
 void ACaveDecorationActor_Crystal::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime); 
-	ElapsedTime += DeltaTime;
-	
-	ChangeMaterialScalar(ElapsedTime);
+
 }
 
 
 
-void ACaveDecorationActor_Crystal::ChangeMaterialScalar(float ScalarValue)
+void ACaveDecorationActor_Crystal::ChangeMaterialScalar(FName ParamName, float ScalarValue)
 {
-	Super::ChangeMaterialScalar(ScalarValue);
+	Super::ChangeMaterialScalar(ParamName, ScalarValue);
 	if (ObjectMID)
 	{
-		ObjectMID->SetScalarParameterValue(FName("EmissiveParam"), ScalarValue);
+		ObjectMID->SetScalarParameterValue(FName(ParamName), ScalarValue);
 	}
 }
 

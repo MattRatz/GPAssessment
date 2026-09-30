@@ -114,11 +114,11 @@ void AGPAssessmentCharacter::Tick(float DeltaTime)
 	
 	if (ComponentToFocus)
 	{
-		ZoomPlayerCam(DeltaTime);
+		//ZoomPlayerCam(DeltaTime);
 	}
 	else if (!ComponentToFocus)
 	{
-		DeZoomPlayerCam(DeltaTime); 
+		//DeZoomPlayerCam(DeltaTime); 
 	}
 	
 }
@@ -189,8 +189,11 @@ void AGPAssessmentCharacter::RemoveInteractableActor()
 
 void AGPAssessmentCharacter::InteractWithActor()
 {
-	if (StoredInteractActor)
+	if (StoredInteractActor && StoredInteractActor->Implements<UGP_InteractInterface>())
 	{
+		IGP_InteractInterface* InteractActor = Cast<IGP_InteractInterface>(StoredInteractActor); 
+		
+		InteractActor->Interact();
 		UE_LOG(LogTemp, Warning, TEXT("Player trying to interact"));  
 	}
 	else
@@ -222,7 +225,7 @@ void AGPAssessmentCharacter::ZoomPlayerCam(float DeltaTime)
 	CurrentFOV = FMath::Clamp(CurrentFOV, 20.f, 120.f); 
 	FirstPersonCameraComponent->SetFieldOfView(CurrentFOV);
 
-	UE_LOG(LogTemp, Warning, TEXT("Rotation to hit: %s, Player Rotation %s"), *PlayerDungeonLookAtRotation.ToString(), *CurrentCamRotation.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("Rotation to hit: %s, Player Rotation %s"), *PlayerDungeonLookAtRotation.ToString(), *CurrentCamRotation.ToString());
 	
 }
 
@@ -243,10 +246,10 @@ void AGPAssessmentCharacter::DeZoomPlayerCam(float DeltaTime)
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("OriginalCamRotation %s, CurrentCamRotation %s"), *OriginalCamRotation.ToString(), *CurrentCamRotation.ToString());
+			//UE_LOG(LogTemp, Warning, TEXT("OriginalCamRotation %s, CurrentCamRotation %s"), *OriginalCamRotation.ToString(), *CurrentCamRotation.ToString());
 		}
 		
-		UE_LOG(LogTemp, Warning, TEXT("Original FOV %f, OriginalCamRotation %s"), OriginalFOV, *OriginalCamRotation.ToString()  );
+		//UE_LOG(LogTemp, Warning, TEXT("Original FOV %f, OriginalCamRotation %s"), OriginalFOV, *OriginalCamRotation.ToString()  );
 	}
 	if (FMath::IsNearlyEqual(CurrentFOV, OriginalFOV,  CompareVariance))
 	{

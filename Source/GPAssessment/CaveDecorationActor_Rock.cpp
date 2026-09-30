@@ -18,7 +18,11 @@ void ACaveDecorationActor_Rock::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ACaveDecorationActor_Rock::ChangeMaterialScalar(float ScalarValue)
+void ACaveDecorationActor_Rock::ChangeMaterialScalar(FName ParamName, float ScalarValue)
 {
-	
+	Super::ChangeMaterialScalar(ParamName, ScalarValue);
+	if (ObjectMID)
+	{
+		ObjectMID->SetScalarParameterValue(FName(ParamName), ScalarValue);
+	}
 }

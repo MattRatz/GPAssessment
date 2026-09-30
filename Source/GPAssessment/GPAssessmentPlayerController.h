@@ -25,24 +25,28 @@ class GPASSESSMENT_API AGPAssessmentPlayerController : public APlayerController
 protected:
 
 	/** Input Mapping Context to be used for player input */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	UInputMappingContext* InputMappingContext;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputMappingContext* DefaultMappingContext;
 
 	// Begin Actor interface
+	
+public: 
+	
+	void OpenMenuUI(TSubclassOf<UUserWidget> WidgetToOpen);
 protected:
 
 	virtual void BeginPlay() override;
 	
 	virtual void SetupInputComponent() override; 
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	class UInputMappingContext* DefaultMappingContext;
-	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UUserWidget> MaterialEditorWidget; 
 	
 	UPROPERTY()
 	UUserWidget* MaterialEditorInstance; 
+	
+	UPROPERTY()
+	UUserWidget* ActiveWidgetInstance; 
 	
 
 	// End Actor interface

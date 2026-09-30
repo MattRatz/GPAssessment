@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Kismet/GameplayStatics.h"
 #include "CaveDecorationActor.generated.h"
 
 UCLASS(Blueprintable, BlueprintType)
@@ -41,7 +42,7 @@ public:
 	bool IsSelected; 
 	
 	UFUNCTION(BlueprintCallable, Category = "Functional")
-	virtual void ChangeMaterialScalar(float ScalarValue); 
+	virtual void ChangeMaterialScalar(FName ParamName, float ScalarValue); 
 	
 	UFUNCTION(BlueprintCallable, Category = "Functional")
 	void  SelectMaterial(); 

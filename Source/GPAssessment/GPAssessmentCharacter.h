@@ -16,6 +16,7 @@ class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
 class UUserWidget; 
+class IGP_InteractInterface;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 

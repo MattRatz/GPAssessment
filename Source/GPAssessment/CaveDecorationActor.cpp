@@ -22,6 +22,7 @@ void ACaveDecorationActor::BeginPlay()
 	if (OverlayMaterial)
 	{
 		OverlayMaterialMID = UMaterialInstanceDynamic::Create(OverlayMaterial, this);
+		ObjectMesh->SetOverlayMaterial(OverlayMaterialMID);
 	}
 	
 	ObjectMaterial = ObjectMesh->GetMaterial(0);
@@ -40,16 +41,30 @@ void ACaveDecorationActor::Tick(float DeltaTime)
 
 }
 
-void ACaveDecorationActor::ChangeMaterialScalar(float ScalarValue)
+void ACaveDecorationActor::ChangeMaterialScalar(FName ParamName, float ScalarValue)
 {
 	
 }
 
 void ACaveDecorationActor::SelectMaterial()
 {
+	IsSelected = true;
+ 
+	if (OverlayMaterialMID)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Selecting Material %s"), *GetNameSafe(this));
+		OverlayMaterialMID->SetScalarParameterValue(FName("LineThickness"), 3.0f);
+		
+	}
 }
 
 void ACaveDecorationActor::DeSelectMaterial()
 {
+	IsSelected = false; 
+	
+	if (OverlayMaterialMID)
+	{
+		OverlayMaterialMID->SetScalarParameterValue(FName("LineThickness"), 0.0f);
+	}
 }
 

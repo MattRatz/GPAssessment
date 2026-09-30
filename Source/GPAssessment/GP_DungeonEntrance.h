@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "GP_InteractInterface.h"
 #include "Components/SphereComponent.h"
+#include "GPAssessmentPlayerController.h"
 #include "Kismet/GameplayStatics.h" 
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
@@ -38,6 +39,9 @@ public:
 	
 	UPROPERTY()
 	TObjectPtr<UUserWidget> TestWidgetInstance;  
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<class UUserWidget> WidgetToOpen; 
 
 private: 
 	
